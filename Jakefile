@@ -1,6 +1,4 @@
 /**
- * Build process for the `cloudfoundry-jslib` project.
- * 
  * Prior to running this, make sure you have the following
  * NPM packages _globally installed_:
  * 
@@ -22,18 +20,17 @@
 
 var doc    = require('node-idocs');
 var api    = require('express-api-docs');
-var tty    = require('tty');
 
 require('jake-utils');
 
-var appjs   = 'app.js';
-var code    = [ 'services' , 'routes' ];      // All source code as an array
-var allcode = code.concat( [ 'resources' ] );
+var appjs   = 'router.js';
+var code    = [ 'routes' ];      // All source code as an array
 
 var docdest = 'docs';           // Generated docs go here
 var apidest = 'public/api.html';  // Generated API documentation
 var covlib  = 'test/lib';         // Code coverage library versions
 
+var testLog        = "test/tests.log";
 var coverageReport = "test/coverage.html";
 var tapReport      = "test/results.tap";
 
@@ -88,7 +85,7 @@ task('client-docs', function() {
     
     doc.generate({
         include: 'public/js',
-        exclude: 'libs',
+        exclude: 'lib',
         output: docdest + "/client"
     });
     
@@ -107,7 +104,7 @@ desc("Lints all of the script files in the `lib` directory");
 task('lint', function(){
     start("Analyzing the Script Files");
     
-    lint( allcode );
+    lint( code );
     
     end();
 });
@@ -124,12 +121,8 @@ desc("Creates new *coverage-able* versions of the library scripts in the `test/l
 task('coverager', function() {
     start("Generating new 'coverage-able' script versions");
     
-    jscoverage( allcode, covlib );
+    jscoverage( code, covlib );
 
-    // Note: We do not want to orchestrate database.js and dbconn.js as these
-    //       will be taken care of by the run-tests-db script:
-    cp( 'config.js', 'test/lib' );
-    
     end("Results stored in '%s'", covlib);
 });
 
@@ -140,8 +133,10 @@ task('coverager', function() {
 desc("Generates a code coverage report after running the tests");
 task('coverage', [ 'coverager' ], function() {
     start("Generating the code coverage report");
+    
     process.env.NODE_ENV = "testing";
-    rm('test/tests.log'); 
+    rm('-f', coverageReport);
+    rm('-f', testLog); 
     
     mochaTests({
         directory: 'test',
@@ -154,6 +149,7 @@ task('coverage', [ 'coverager' ], function() {
     end("Results stored in '%s'", coverageReport);
 });
 
+
 /**
  * Runs all of the tests and displays the results differently
  * depending on if you run them from the command line (TTY) or 
@@ -164,7 +160,7 @@ desc("Runs the 'mocha' unit tests");
 task('test', function(params) {
     start("Running the 'mocha' unit tests");
     process.env.NODE_ENV = "testing";
-    rm('./test/tests.log'); 
+    rm('-f', testLog); 
     
     var options = {
         directory : 'test',
@@ -184,7 +180,8 @@ desc("Runs the 'mocha' unit tests and stores the results in a TAP file");
 task('test-tap', function(){
     start("Running the 'mocha' unit tests");
     process.env.NODE_ENV = "testing";
-    rm('test/tests.log'); 
+    rm('-f', testLog); 
+    rm('-f', tapReport); 
     
     mochaTests({
         directory: 'test',
@@ -231,6 +228,7 @@ task('clean', function() {
     rm("-rf", apidest);
     rm("-rf", coverageReport);
     rm("-rf", tapReport);
+    rm("-rf", testLog);
 
     end();
 });
