@@ -1,7 +1,10 @@
-var routes = require('./routes');
+var routes = require('../routes');
 
-// Routes
-module.exports.setup = function( app ) {
+/**
+ * Create all of the Express routes. This should contain the entire public API
+ * with all REST references.
+ */
+exports.setup = function( app ) {
 
     app.get('/', routes.index);
 
