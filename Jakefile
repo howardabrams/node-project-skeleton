@@ -44,7 +44,26 @@ var tapReport      = "test/results.tap";
 
 desc('Builds most things');
 task('default', ['depends', 'lint', 'test', 'server-docs', 'client-docs', 'api']);
+task('jenkins', ['clean', 'depends', 'build', 'lint', 'test-tap', 'coverage', 'server-docs', 'client-docs', 'api'])
 
+/**
+ * Creates an file, `build.json` that can be used to identify a deployment. 
+ */
+desc("Creates the build.json and any other things needed to setup the app");
+task("build", function() {
+    var versionTag = "-dev";
+    if ( process.env.GIT_BRANCH == "stable" ) {
+        versionTag = "";
+    }
+    file.write('public/build.json', {
+        "version": project['package'].version + versionTag,
+        "build": process.env.BUILD_NUMBER ? process.env.BUILD_NUMBER : "local",
+        "date" : new Date(),
+        "url"  : process.env.BUILD_URL ? process.env.BUILD_URL : "http://localhost"
+    });
+    
+    markdown("README.md", "README.html");
+});
 
 /**
  * Generates the public REST API documentation by using the
@@ -52,7 +71,7 @@ task('default', ['depends', 'lint', 'test', 'server-docs', 'client-docs', 'api']
  */
 desc("Create the public REST API documentation");
 task('api', function() {
-    start("Generating the Internal Documentation");
+    start("Generating the REST API Documentation");
     
     api.generate(appjs, apidest);
 
@@ -230,17 +249,5 @@ task('clean', function() {
     rm("-rf", tapReport);
     rm("-rf", testLog);
 
-    end();
-});
-
-/**
- * Cleans everything, even the cached dependencies in the 
- * `node_modules` directory.
- */
-
-desc("Cleans everything, even the cached dependencies in the `node_modules` directory.");
-task('clean-all', [ 'clean'], function() {
-    start("Removing cached library modules");
-    rm('-rf', 'node_modules');
     end();
 });

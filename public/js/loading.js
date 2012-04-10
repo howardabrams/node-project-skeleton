@@ -1,6 +1,8 @@
-// Copyright (c) 2012. This file is confidential and proprietary.
-// All Rights Reserved, Huawei Technologies (http://www.huawei.com)
-$( function() {
+/**
+ * Called for each AJAX call.
+ */
+
+jQuery( function() {
     // create the loading window and set autoOpen to false
     $('#loading').dialog({
         autoOpen: false,
@@ -23,14 +25,19 @@ $( function() {
     }); // end of dialog
 });
 
-// Show loading dialog, you can set the dialog title or message
+/**
+ * Show loading dialog, you can set the dialog title or message
+ */
+
 function showLoading() {
     $('#loading').html( 'Please wait...' );
     $('#loading').dialog( 'option', 'title', 'Loading' );
     $('#loading').dialog( 'open' );
 }
 
-// close dialog
+/**
+ * Close the dialog when the loading is complete.
+ */
 function closeLoading() {
     $('#loading').dialog( 'close' );
 }

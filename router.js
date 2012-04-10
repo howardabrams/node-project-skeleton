@@ -1,4 +1,4 @@
-var routes = require('../routes');
+var routes = require('./routes/index');
 
 /**
  * Create all of the Express routes. This should contain the entire public API

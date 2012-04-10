@@ -4,7 +4,7 @@
 
 var express = require('express');
 var router  = require('./router');
-var config  = require('./config').config;
+var config  = require('./config').values;
 
 var app     = express.createServer();
 
@@ -25,6 +25,26 @@ app.configure('production', function(){
   app.use(express.errorHandler());
 });
 
-app.listen(config.port);
+/**
+ * Configuration can come from the 'config.js' file
+ * and from command line options. 
+ * 
+ * The --public option removes the 'localhost' reference
+ * in the config file allowing remote hosts to connect.
+ */
+
+if (process.argv.indexOf('--public') > -1) {
+    config.public = true;
+}
+
+if (config.public) {
+        app.listen(config.port);
+}
+else {
+        app.listen(config.port, config.host);
+}
+
+router.setup(app);
+
 console.log("Express server listening on port %d in %s mode", 
-	    app.address().port, app.settings.env);
+	    config.port, app.settings.env);
