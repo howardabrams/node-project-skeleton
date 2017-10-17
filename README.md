@@ -45,6 +45,6 @@ What you do get from this project is the following:
   [1]: http://nodejs.org/
   [2]: http://npmjs.org/
   [3]: http://expressjs.com/
-  [4]: http://visionmedia.github.com/mocha/
+  [4]: https://mochajs.org/
   [5]: http://jquery.com
   [6]: http://www.fuzzytoast.com
